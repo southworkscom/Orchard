@@ -23,6 +23,14 @@
             id = 'amp-@Html.Raw(renderId)',
             data = JSON.parse('@Html.Raw(assetDataJson.ToString())');
 
+        if (data.VideoAssets &&
+            Array.isArray(data.VideoAssets) &&
+            data.VideoAssets.length > 0 &&
+            data.VideoAssets[0].MainFileUrl)
+        {
+            videoUrl = data.VideoAssets[0].MainFileUrl;
+        }
+
         if (data.DynamicVideoAssets &&
             Array.isArray(data.DynamicVideoAssets) &&
             data.DynamicVideoAssets.length > 0 &&
