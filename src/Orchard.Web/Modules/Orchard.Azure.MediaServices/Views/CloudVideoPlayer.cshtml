@@ -1,8 +1,8 @@
 ﻿@using Newtonsoft.Json;
 
 @{
-    Style.Include("amp/azuremediaplayer.min.css");
-    Script.Include("amp/azuremediaplayer.min.js").AtHead();
+    Style.Include("~/Modules/Orchard.Azure.MediaServices/Content/amp/azuremediaplayer.min.css");
+    Script.Include("~/Modules/Orchard.Azure.MediaServices/Content/amp/azuremediaplayer.min.js").AtHead();
 
     var altText = Model.AlternateText;
     var assetDataJson = JsonConvert.SerializeObject(Model.AssetData, Formatting.None);
@@ -19,7 +19,9 @@
 </video>
 <script>
     (function () {
-        var videoUrl = undefined,
+        var subtitlesUrls = undefined,
+            posterUrl = undefined,
+            videoUrl = undefined,
             id = 'amp-@Html.Raw(renderId)',
             data = JSON.parse('@Html.Raw(assetDataJson.ToString())');
 
@@ -29,6 +31,7 @@
             data.VideoAssets[0].MainFileUrl)
         {
             videoUrl = data.VideoAssets[0].MainFileUrl;
+            videoType = "video/mp4";
         }
 
         if (data.DynamicVideoAssets &&
@@ -37,11 +40,42 @@
             data.DynamicVideoAssets[0].SmoothStreamingUrl)
         {
             videoUrl = data.DynamicVideoAssets[0].SmoothStreamingUrl;
+            videoType = "application/vnd.ms-sstr+xml";
+        }
+
+        if (data.SubtitleAssets &&
+            Array.isArray(data.SubtitleAssets))
+        {
+            subtitlesUrls = data.SubtitleAssets.map(function(item) {
+                return {
+                    src: item.MainFileUrl,
+                    srclang: item.Language.substring(0,2),
+                    kind: 'subtitles',
+                    label: item.Name
+                };
+            });
+        }
+
+        if (data.ThumbnailAssets &&
+            Array.isArray(data.ThumbnailAssets) &&
+            data.ThumbnailAssets.length > 0 &&
+            data.ThumbnailAssets[0].MainFileUrl)
+        {
+            posterUrl = data.ThumbnailAssets[0].MainFileUrl;
         }
 
         if (videoUrl) {
-            var player = amp(id, { logo: { enabled: false }, autoplay: @autoPlay.ToString().ToLower() }, function () {
-                this.src({ src: videoUrl });
+            var options = {
+                logo: { enabled: false },
+                autoplay: @autoPlay.ToString().ToLower()
+            };
+
+            if (posterUrl) {
+                options.poster = posterUrl;
+            }
+
+            var player = amp(id, options, function () {
+                this.src([{ src: videoUrl, type: videoType }], subtitlesUrls);
             });
         }
     })();
