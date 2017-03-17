@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Threading.Tasks;
 using Orchard.Caching;
 using Orchard.Environment.Configuration;
@@ -21,8 +20,6 @@ using System.Threading;
 namespace Orchard.Environment {
     // All the event handlers that DefaultOrchardHost implements have to be declared in OrchardStarter.
     public class DefaultOrchardHost : IOrchardHost, IShellSettingsManagerEventHandler, IShellDescriptorManagerEventHandler {
-        private string AppSettingsKeyDataProvider = "defaultProvider";
-        private string ConnectionStringDefaultConnection = "defaultConnection";
         private readonly IHostLocalRestart _hostLocalRestart;
         private readonly IShellSettingsManager _shellSettingsManager;
         private readonly IShellContextFactory _shellContextFactory;
@@ -227,20 +224,7 @@ namespace Orchard.Environment {
         /// </summary>
         private ShellContext CreateSetupContext() {
             Logger.Debug("Creating shell context for root setup.");
-            var shellSettings = new ShellSettings { Name = ShellSettings.DefaultName };
-
-            if (ConfigurationManager.ConnectionStrings[ConnectionStringDefaultConnection] != null)
-            {
-                shellSettings.DataConnectionString = ConfigurationManager.ConnectionStrings[ConnectionStringDefaultConnection].ConnectionString;
-                shellSettings.DataProvider = "SqlServer";
-            }
-
-            if (ConfigurationManager.AppSettings[AppSettingsKeyDataProvider] != null)
-            {
-                shellSettings.DataProvider = ConfigurationManager.AppSettings[AppSettingsKeyDataProvider];
-            }
-
-            return _shellContextFactory.CreateSetupContext(shellSettings);
+            return _shellContextFactory.CreateSetupContext(new ShellSettings { Name = ShellSettings.DefaultName });
         }
 
         /// <summary>
