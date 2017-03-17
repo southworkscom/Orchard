@@ -2,7 +2,9 @@
 <Orchard>
     <Recipe>
         <Name>Video Portal</Name>
-        <Description>The Video Portal recipe based on the default one.</Description>
+        <Description>
+          The Video Portal recipe for an Orchard site that includes the same features as the Default recipe (pages, blogs, custom content types, comments, tags, widgets and basic navigation) plus support for managing video content (uploading, encoding and delivering) in Azure Media Services.
+        </Description>
         <Author>Microsoft</Author>
         <WebSite>http://orchardproject.net</WebSite>
         <Category>Default</Category>
